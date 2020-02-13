@@ -34,9 +34,33 @@ Es ist wichtig zu wissen, dass die Kunst ein TonUINO zu bauen grundsätzlich als
 
 ### Mikrocontroller-Hardware
 
-Es muss gelötet werden. Wir gehen davon aus, dass Lötkolben, Lötzinn und Löterfahrung vorhanden sind. Eine sehr gute Anleitung gibt es bei [YouTube](https://www.youtube.com/watch?v=RmE09dsY-l0) und einen Schaltplan auf der [offiziellen Webseite](https://www.voss.earth/tonuino/). Da hier jedoch die genaue Orientierung der Pins nicht ersichtlich ist, hilft auch noch ein alternativer Schaltplan von [dieser Webseite](https://smarthomeyourself.de/anleitung-zum-selber-bauen/unabhaengige-projekte/tonuino-der-kinderfreundliche-rfid-audio-player/), um die richtigen Pins zu identifizieren. Die notwendigen Komponenten können über Reichelt, Conrad, Amazon, E-Bay oder Alibaba bezogen werden. Meist lohnt sich jetzt schon die Planung von mehreren TonUINO-Boxen. Im Folgenden Amazon-Affiliate-Links von Komponenten, die Thorsten und andere aus der Community erfolgreich verbaut haben. In der [Community Hardware FAQ](https://discourse.voss.earth/t/faq-kategorie-hardware/926/2) gibt es weitere wertvolle Hinweise.
+Es muss gelötet werden. Wir gehen davon aus, dass Lötkolben, Lötzinn und Löterfahrung vorhanden sind. Eine sehr gute Anleitung gibt es bei [YouTube](https://www.youtube.com/watch?v=RmE09dsY-l0) und einen Schaltplan auf der [offiziellen Webseite](https://www.voss.earth/tonuino/). Da hier jedoch die genaue Orientierung der Pins nicht ersichtlich ist, hilft auch noch ein alternativer Schaltplan von [dieser Webseite](https://smarthomeyourself.de/anleitung-zum-selber-bauen/unabhaengige-projekte/tonuino-der-kinderfreundliche-rfid-audio-player/), um die richtigen Pins zu identifizieren. Auf Basis eines [Forum-Beitrages](http://discourse.voss.earth/t/einfacher-schaltplan/5021) im Folgenden eine tabellarische Übersicht:
+
+| Text | Pin | Gerät | Ardunio: Pin | Ardunio: Text | Ardunio: Text | Ardunio: Pin | Gerät | Pin | Test |
+| ---  | --- | ---   | ---          | ---           | ---           |          --- |   --- | --- | ---  |
+|      |     |       | 01           | D0            | Vin           | 30           |       |     |      |
+|      |     |       | 02           | D1            | GND           | 29           | RFID  | 6   | GND  |
+|      |     |       | 03           |               |               | 28           |       |     |      |
+| GND  | 10  | MP3   | 04           | GND           | 5V            | 27           |       |     |      |
+| TX   | 3   | MP3   | 05           | D2            | A7            | 26           |       |     |      |
+| RX   | 2   | MP3   | 06           | D3            | A6            | 25           |       |     |      |
+| BSY  | 16  | MP3   | 07           | D4            | A5            | 24           |       |     |      |
+|      |     |       | 08           | D5            | A4            | 23           |       |     |      |
+|      |     |       | 09           | D6            | A3            | 22           |       |     |      |
+|      |     |       | 10           | D7            | A2            | 21           | Knopf | 3   | -    |
+|      |     |       | 11           | D8            | A1            | 20           | Knopf | 2   | +    |
+| RST  | 7   | RFID  | 12           | D9            | A0            | 19           | Knopf | 1   | Play |
+| SDA  | 1   | RFID  | 13           | D10           | REF           | 18           |       |     |      |
+| MOSI | 3   | RFID  | 14           | D11           | 3,3V          | 17           | RFID  | 8   | 3,3V |
+| MISO | 4   | RFID  | 15           | D12           | D13           | 16           | RFID  | 2   | SCK  |
+
+Die passenden Abbildungen:
+
+![PIN-Belegung](TonUINO_PINs.jpg) ![PIN-Schaltplan](TonUINO_Schaltplan.png) 
 
 #### Notwendige Grundausstattung (ca. 30 EUR)
+
+Die notwendigen Komponenten können über Reichelt, Conrad, Amazon, E-Bay oder Alibaba bezogen werden. Meist lohnt sich jetzt schon die Planung von mehreren TonUINO-Boxen. Im Folgenden Amazon-Affiliate-Links von Komponenten, die Thorsten und andere aus der Community erfolgreich verbaut haben. In der [Community Hardware FAQ](https://discourse.voss.earth/t/faq-kategorie-hardware/926/2) gibt es weitere wertvolle Hinweise.
 
 | Anzahl | Produkt | Beschreibung | Hinweis | Kosten |
 | --- | --- | ---  | --- | --- |
@@ -89,6 +113,10 @@ Als einfacher Benutzer sollte die Programmierung so einfach gestaltet sein wie m
    3. `Port` den Punkt `/dev/cu.wchusbserial???` auswählen (je nach Betriebssystem könnte es anders aussehen)
 6. Nun kann die Software unter `Sketch` und dann `Hochladen` auf den Arduino hoch geladen werden.
 
+Kurzanleitung zum Aufspielen der Firmware für Benutzer:
+
+[![Kurzanleitung zum Aufspielen der Firmware für Benutzer](https://j.gifs.com/3Q0rM4.gif)](https://youtu.be/OxXnBpHxEyY)
+
 Darüber hinaus muss noch die SD-Karte vorbereitet werden:
 
 1. Die Karte mit FAT32 formatieren.
@@ -118,6 +146,10 @@ Available commands:
 - test    : run some basic tests on the code
 - clean   : delete temporary files
 ```
+
+Kurzanleitung zum Aufspielen der Firmware für Entwickler:
+
+[![Kurzanleitung zum Aufspielen der Firmware für Entwickler](https://asciinema.org/a/yduPdLWRVGB7ZifyKckmnVFFu.png)](https://asciinema.org/a/yduPdLWRVGB7ZifyKckmnVFFu)
 
 Darüber hinaus gibt es 
 * auf der [offiziellen Webseite](https://www.voss.earth/tonuino/) und im Repository noch einige nützliche Skripte, die noch nicht in das `Makefile` integriert sind
