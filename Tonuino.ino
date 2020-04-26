@@ -20,6 +20,9 @@
 // uncomment the below line to enable five button support
 //#define FIVEBUTTONS
 
+// uncomment the below line to stop playback when card is removed
+//#define PAUSEONCARDREMOVAL
+
 // delay for volume buttons
 #define LONG_PRESS_DELAY 300
 
@@ -50,6 +53,9 @@ struct nfcTagObject {
   //  uint8_t special;
   //  uint8_t special2;
 };
+
+bool card_present = false;
+bool card_present_prev = false;
 
 // admin settings stored in eeprom
 struct adminSettings {
@@ -95,29 +101,26 @@ class Mp3Notify {
       Serial.print("Com Error ");
       Serial.println(errorCode);
     }
-    static void OnPlayFinished(uint16_t track) {
+    static void PrintlnSourceAction(DfMp3_PlaySources source, const char* action) {
+      if (source & DfMp3_PlaySources_Sd) Serial.print("SD Karte ");
+      if (source & DfMp3_PlaySources_Usb) Serial.print("USB ");
+      if (source & DfMp3_PlaySources_Flash) Serial.print("Flash ");
+      Serial.println(action);
+    }
+    static void OnPlayFinished(DfMp3_PlaySources source, uint16_t track) {
       //      Serial.print("Track beendet");
       //      Serial.println(track);
       //      delay(100);
       nextTrack(track);
     }
-    static void OnCardOnline(uint16_t code) {
-      Serial.println(F("SD Karte online "));
+    static void OnPlaySourceOnline(DfMp3_PlaySources source) {
+      PrintlnSourceAction(source, "online");
     }
-    static void OnCardInserted(uint16_t code) {
-      Serial.println(F("SD Karte bereit "));
+    static void OnPlaySourceInserted(DfMp3_PlaySources source) {
+      PrintlnSourceAction(source, "bereit");
     }
-    static void OnCardRemoved(uint16_t code) {
-      Serial.println(F("SD Karte entfernt "));
-    }
-    static void OnUsbOnline(uint16_t code) {
-      Serial.println(F("USB online "));
-    }
-    static void OnUsbInserted(uint16_t code) {
-      Serial.println(F("USB bereit "));
-    }
-    static void OnUsbRemoved(uint16_t code) {
-      Serial.println(F("USB entfernt "));
+    static void OnPlaySourceRemoved(DfMp3_PlaySources source) {
+      PrintlnSourceAction(source, "entfernt");
     }
 };
 
@@ -725,13 +728,13 @@ void waitForTrackToFinish() {
 void setup() {
 
   Serial.begin(115200); // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
-   
+
   // Wert für randomSeed() erzeugen durch das mehrfache Sammeln von rauschenden LSBs eines offenen Analogeingangs
   uint32_t ADC_LSB;
   uint32_t ADCSeed;
-  for(uint8_t i = 0; i < 128; i++) {
+  for (uint8_t i = 0; i < 128; i++) {
     ADC_LSB = analogRead(openAnalogPin) & 0x1;
-    ADCSeed ^= ADC_LSB << (i % 32); 
+    ADCSeed ^= ADC_LSB << (i % 32);
   }
   randomSeed(ADCSeed); // Zufallsgenerator initialisieren
 
@@ -952,7 +955,28 @@ void playShortCut(uint8_t shortCut) {
 }
 
 void loop() {
+  int _rfid_error_counter = 0;
+  
   do {
+
+#ifdef PAUSEONCARDREMOVAL
+    // auf Lesefehler des RFID Moduls prüfen
+    _rfid_error_counter += 1;
+    if(_rfid_error_counter > 2){
+      card_present = false;
+    }
+
+    // Ist eine Karte aufgelegt?
+    byte bufferATQA[2];
+    byte bufferSize = sizeof(bufferATQA);
+    MFRC522::StatusCode result = mfrc522.PICC_RequestA(bufferATQA, &bufferSize);
+  
+    if(result == mfrc522.STATUS_OK){
+      _rfid_error_counter = 0;
+      card_present = true;
+    }
+#endif
+
     checkStandbyAtMillis();
     mp3.loop();
 
@@ -1098,10 +1122,11 @@ void loop() {
     }
 #endif
     // Ende der Buttons
+
+#ifndef PAUSEONCARDREMOVAL
   } while (!mfrc522.PICC_IsNewCardPresent());
-
+  
   // RFID Karte wurde aufgelegt
-
   if (!mfrc522.PICC_ReadCardSerial())
     return;
 
@@ -1109,7 +1134,7 @@ void loop() {
     if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) {
       playFolder();
     }
-
+  
     // Neue Karte konfigurieren
     else if (myCard.cookie != cardCookie) {
       knownCard = false;
@@ -1117,9 +1142,58 @@ void loop() {
       waitForTrackToFinish();
       setupCard();
     }
+   }
+   mfrc522.PICC_HaltA();
+   mfrc522.PCD_StopCrypto1();
+
+#endif
+#ifdef PAUSEONCARDREMOVAL
+  // solange keine Karte aufgelegt oder heruntergenommen wird
+  } while ( !(!card_present && card_present_prev) && !(card_present && !card_present_prev) );
+  
+  // RFID Karte wurde entfernt
+  if (!card_present && card_present_prev){
+    card_present_prev = card_present;
+      // pausiere
+      if (activeModifier != NULL)
+        if (activeModifier->handlePause() == true)
+          return;
+      if (ignorePauseButton == false)
+        if (isPlaying()) {
+          mp3.pause();
+          setstandbyTimer();
+        }
+        else if (knownCard) {
+          mp3.start();
+          disablestandbyTimer();
+        }
+      ignorePauseButton = false;
+      return;
   }
-  mfrc522.PICC_HaltA();
-  mfrc522.PCD_StopCrypto1();
+
+  // RFID Karte wurde aufgelegt
+  if (card_present && !card_present_prev){
+    card_present_prev = card_present;
+
+    if (!mfrc522.PICC_ReadCardSerial())
+      return;
+
+    if (readCard(&myCard) == true) {
+      if (myCard.cookie == cardCookie && myCard.nfcFolderSettings.folder != 0 && myCard.nfcFolderSettings.mode != 0) {
+        playFolder();
+      }
+  
+      // Neue Karte konfigurieren
+      else if (myCard.cookie != cardCookie) {
+        knownCard = false;
+        mp3.playMp3FolderTrack(300);
+        waitForTrackToFinish();
+        setupCard();
+      }
+    }
+    mfrc522.PCD_StopCrypto1();
+  }
+#endif
 }
 
 void adminMenu(bool fromCard) {

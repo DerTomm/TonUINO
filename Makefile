@@ -22,14 +22,15 @@ info:
 	$(info Configured to use MCU "$(MCU)" attached to port "$(SERIAL)".)
 	$(info )
 	$(info Available commands:)
-	$(info - help    : get support from the community)
-	$(info - install : installation of required binaries (arduino-cli))
-	$(info - init    : initialize environment (arduino-cli))
-	$(info - compile : create binary)
-	$(info - upload  : store binary on board flash)
-	$(info - find    : get information about the pluged-in board)
-	$(info - test    : run some basic tests on the code)
-	$(info - clean   : delete temporary files)
+	$(info - help     : get support from the community)
+	$(info - install  : installation of required binaries (arduino-cli))
+	$(info - init     : initialize environment (arduino-cli))
+	$(info - compile  : create binary)
+	$(info - upload   : store binary on board flash)
+	$(info - find     : get information about the pluged-in board)
+	$(info - test     : run some basic tests on the code)
+	$(info - clean    : delete temporary files)
+	$(info - feedback : provide feedback and report issues)
 	@true
 
 help:
@@ -57,9 +58,12 @@ init:
 	@arduino-cli config init
 	@arduino-cli core update-index
 	@arduino-cli core install $(BOARD)
+	@arduino-cli lib update-index
 	@arduino-cli lib install "DFPlayer Mini Mp3 by Makuna"
 	@arduino-cli lib install "MFRC522"
 	@arduino-cli lib install "JC_Button"
+	@platformio upgrade
+	@platformio update
 	@platformio lib install 1561 # DFPlayer Mini Mp3 by Makuna
 	@platformio lib install 2284 # EEPROM
 	@platformio lib install 77   # JC_Button
@@ -91,3 +95,6 @@ check: *.ino
 clean:
 	@rm -rf "$(SKETCH)"
 	@rm -rf ".pio/build/"
+
+feedback:
+	@python -m webbrowser "https://github.com/alexanderwillner/tonuino/issues"
