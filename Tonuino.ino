@@ -694,7 +694,7 @@ void checkStandbyAtMillis() {
   if (sleepAtMillis != 0 && millis() > sleepAtMillis) {
     Serial.println(F("=== power off!"));
     // enter sleep state
-    digitalWrite(shutdownPin, HIGH);
+    digitalWrite(shutdownPin, LOW);
     delay(500);
 
     // http://discourse.voss.earth/t/intenso-s10000-powerbank-automatische-abschaltung-software-only/805
@@ -783,7 +783,7 @@ void setup() {
   pinMode(buttonFivePin, INPUT_PULLUP);
 #endif
   pinMode(shutdownPin, OUTPUT);
-  digitalWrite(shutdownPin, LOW);
+  digitalWrite(shutdownPin, HIGH);
 
 
   // RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
