@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <avr/sleep.h>
+#include <FastLED.h>
 
 /*
    _____         _____ _____ _____ _____
@@ -649,6 +650,11 @@ MFRC522::StatusCode status;
 #define amplifierStandbyPin 8
 #define openAnalogPin A7
 
+// FastLED
+#define DATA_PIN 6
+#define NUM_LEDS 1
+CRGB leds[NUM_LEDS];
+
 #ifdef FIVEBUTTONS
 #define buttonFourPin A3
 #define buttonFivePin A4
@@ -695,6 +701,7 @@ void checkStandbyAtMillis() {
 
 void poweroff() {
   Serial.println(F("=== power off!"));
+  setStatusLedColor(CRGB::Black);
   // enter sleep state
   disableDfplayerAmplifier();
   delay(500);
@@ -736,6 +743,11 @@ void setup() {
 
   pinMode(amplifierStandbyPin, OUTPUT);
   disableDfplayerAmplifier();
+
+  // Initialize FastLED and turn on status LED
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.setBrightness(32);
+  setStatusLedColor(CRGB::Blue);
 
   Serial.begin(115200);  // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
 
@@ -802,6 +814,8 @@ void setup() {
     }
     loadSettingsFromFlash();
   }
+
+  setStatusLedColor(CRGB::Green);
 
   // Start Shortcut "at Startup" - e.g. Welcome Sound
   playShortCut(3);
@@ -1886,4 +1900,11 @@ bool checkTwo(uint8_t a[], uint8_t b[]) {
     }
   }
   return true;
+}
+
+void setStatusLedColor(CRGB color) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = color;
+  }
+  FastLED.show();
 }
