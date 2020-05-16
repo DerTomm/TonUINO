@@ -91,6 +91,12 @@ void dump_byte_array(byte *buffer, byte bufferSize);
 void adminMenu(bool fromCard = false);
 bool knownCard = false;
 
+// Additional members and prototypes
+void disablestandbyTimer();
+void setstandbyTimer();
+
+long batteryMeasureTimestamp;
+
 // implement a notification class,
 // its member methods will get called
 //
@@ -119,9 +125,15 @@ class Mp3Notify {
   }
   static void OnPlaySourceInserted(DfMp3_PlaySources source) {
     PrintlnSourceAction(source, "bereit");
+    if (source & DfMp3_PlaySources_Flash) {
+      disablestandbyTimer();
+    }
   }
   static void OnPlaySourceRemoved(DfMp3_PlaySources source) {
     PrintlnSourceAction(source, "entfernt");
+    if (source & DfMp3_PlaySources_Flash) {
+      setstandbyTimer();
+    }
   }
 };
 
@@ -737,16 +749,20 @@ void waitForTrackToFinish() {
 
 void setup() {
 
-  //  Pull power supply board ENABLE pin high to get power
+  // Power supply board ENABLE pin
   pinMode(shutdownPin, OUTPUT);
   digitalWrite(shutdownPin, HIGH);
 
+  // Amplifier standby pin
   pinMode(amplifierStandbyPin, OUTPUT);
   disableDfplayerAmplifier();
 
+  // Battery voltage sense pin
+  pinMode(A5, INPUT);
+
   // Initialize FastLED and turn on status LED
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(32);
+  FastLED.setBrightness(16);
   setStatusLedColor(CRGB::Blue);
 
   Serial.begin(115200);  // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
@@ -815,10 +831,14 @@ void setup() {
     loadSettingsFromFlash();
   }
 
-  setStatusLedColor(CRGB::Green);
+  enableDfplayerAmplifier();
+  //delay(500);
 
   // Start Shortcut "at Startup" - e.g. Welcome Sound
   playShortCut(3);
+
+  // This initially sets status LED color
+  checkBatteryVoltage();
 }
 
 void readButtons() {
@@ -970,9 +990,6 @@ void playFolder() {
     currentTrack = 1;
     mp3.playFolderTrack(myFolder->folder, queue[currentTrack - 1]);
   }
-
-  delay(1000);
-  enableDfplayerAmplifier();
 }
 
 void playShortCut(uint8_t shortCut) {
@@ -1018,6 +1035,11 @@ void loop() {
       activeModifier->loop();
     }
 
+    if (millis() - batteryMeasureTimestamp >= 30000) {
+      checkBatteryVoltage();
+      batteryMeasureTimestamp = millis();
+    }
+
     // Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste
     // doppelt belegt werden
     readButtons();
@@ -1039,7 +1061,6 @@ void loop() {
           return;
       if (ignorePauseButton == false) {
         if (isPlaying()) {
-          disableDfplayerAmplifier();
           mp3.pause();
           setstandbyTimer();
         } else if (knownCard) {
@@ -1907,4 +1928,22 @@ void setStatusLedColor(CRGB color) {
     leds[i] = color;
   }
   FastLED.show();
+}
+
+float readBatteryVoltage() {
+  int batteryVoltage = analogRead(A5);
+  return batteryVoltage * (4.2 / 1023.0);
+}
+
+void checkBatteryVoltage() {
+  float batteryVoltage = readBatteryVoltage();
+  Serial.print("Battery voltage: ");
+  Serial.println(batteryVoltage);
+  if (batteryVoltage <= 3.4) {
+    setStatusLedColor(CRGB::Red);
+  } else if (batteryVoltage <= 3.7) {
+    setStatusLedColor(CRGB::Yellow);
+  } else {
+    setStatusLedColor(CRGB::Green);
+  }
 }
