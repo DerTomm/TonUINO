@@ -1,7 +1,7 @@
 #ifndef _TODDLER_MODE_H
 #define _TODDLER_MODE_H
 
-class Tonuinoo;
+class Tonuino;
 class ToddlerMode : public Modifier {
  public:
   virtual bool handlePause() {

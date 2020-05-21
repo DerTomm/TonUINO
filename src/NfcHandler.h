@@ -7,7 +7,7 @@
 #include <MFRC522.h>
 #include "NfcTagObject.h"
 
-class Tonuinoo;
+class Tonuino;
 class NfcHandler {
 
  public:
@@ -22,6 +22,8 @@ class NfcHandler {
   void halt();
   void init();
 
+  static const uint32_t cardCookie = 322417479;
+
  private:
   void dump_byte_array(byte *buffer, byte bufferSize);
 
@@ -34,8 +36,6 @@ class NfcHandler {
   MFRC522::StatusCode status;
   bool card_present = false;
   bool card_present_prev = false;
-
-  static const uint32_t cardCookie = 322417479;
 };
 
 #endif  // _NFC_HANDLER_H

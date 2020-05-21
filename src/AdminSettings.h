@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "FolderSettings.h"
 
-class Tonuinoo;
+class Tonuino;
 class AdminSettings {
 
  public:
