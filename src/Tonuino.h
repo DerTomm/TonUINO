@@ -5,11 +5,11 @@
 #include <DFMiniMp3.h>
 #include <EEPROM.h>
 #include <JC_Button.h>
-#include <MFRC522.h>
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <avr/sleep.h>
 #include <FastLED.h>
+#include "NfcHandler.h"
 #include "Modifier.h"
 #include "NfcTagObject.h"
 #include "Locked.h"
@@ -36,9 +36,6 @@ uint16_t firstTrack;
 uint8_t queue[255];
 uint8_t volume;
 
-bool card_present = false;
-bool card_present_prev = false;
-
 AdminSettings mySettings;  // admin settings stored in eeprom
 NfcTagObject myCard;
 FolderSettings *myFolder;
@@ -51,8 +48,6 @@ uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
                   bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false);
 bool isPlaying();
 bool checkTwo(uint8_t a[], uint8_t b[]);
-bool readCard(NfcTagObject *nfcTag);
-void writeCard(NfcTagObject nfcTag);
 void dump_byte_array(byte *buffer, byte bufferSize);
 void adminMenu(bool fromCard = false);
 bool knownCard = false;
@@ -67,17 +62,6 @@ void playFolder();
 long batteryMeasureTimestamp;
 
 Modifier *activeModifier = NULL;
-
-// MFRC522
-#define RST_PIN 9                  // Configurable, see typical pin layout above
-#define SS_PIN 10                  // Configurable, see typical pin layout above
-MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522
-MFRC522::MIFARE_Key key;
-bool successRead;
-byte sector = 1;
-byte blockAddr = 4;
-byte trailerBlock = 7;
-MFRC522::StatusCode status;
 
 #define buttonPause A0
 #define buttonUp A1
@@ -164,5 +148,7 @@ class Mp3NotifyCallback {
 
 SoftwareSerial mySoftwareSerial(2, 3);  // RX, TX
 static DFMiniMp3<SoftwareSerial, Mp3NotifyCallback> mp3(mySoftwareSerial);
+
+NfcHandler nfcHandler;
 
 #endif  // _TONUINO_H
