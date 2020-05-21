@@ -1,8 +1,7 @@
 #ifndef _KINDERGARDEN_MODE_H
 #define _KINDERGARDEN_MODE_H
 
-#include "Tonuino.h"
-
+class Tonuinoo;
 class KindergardenMode : public Modifier {
  private:
   NfcTagObject nextCard;
@@ -16,11 +15,11 @@ class KindergardenMode : public Modifier {
     if (this->cardQueued == true) {
       this->cardQueued = false;
 
-      myCard = nextCard;
-      myFolder = &myCard.nfcFolderSettings;
-      Serial.println(myFolder->folder);
-      Serial.println(myFolder->mode);
-      playFolder();
+      Tonuinoo::myCard = nextCard;
+      Tonuinoo::myFolder = &Tonuinoo::myCard.nfcFolderSettings;
+      Serial.println(Tonuinoo::myFolder->folder);
+      Serial.println(Tonuinoo::myFolder->mode);
+      Tonuinoo::playFolder();
       return true;
     }
     return false;
@@ -41,7 +40,7 @@ class KindergardenMode : public Modifier {
     Serial.println(F("== KindergardenMode::handleRFID() -> queued!"));
     this->nextCard = *newCard;
     this->cardQueued = true;
-    if (!isPlaying()) {
+    if (!Tonuinoo::isPlaying()) {
       handleNext();
     }
     return true;

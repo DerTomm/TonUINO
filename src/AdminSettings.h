@@ -1,8 +1,10 @@
 #ifndef _ADMIN_SETTINGS_H
 #define _ADMIN_SETTINGS_H
 
-#include "Tonuino.h"
+#include <Arduino.h>
+#include "FolderSettings.h"
 
+class Tonuinoo;
 class AdminSettings {
 
  public:

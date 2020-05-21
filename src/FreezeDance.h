@@ -1,8 +1,7 @@
 #ifndef _FREEZE_DANCE_H
 #define _FREEZE_DANCE_H
 
-#include "Tonuino.h"
-
+class Tonuinoo;
 class FreezeDance : public Modifier {
  private:
   unsigned long nextStopAtMillis = 0;
@@ -20,8 +19,8 @@ class FreezeDance : public Modifier {
   void loop() {
     if (this->nextStopAtMillis != 0 && millis() > this->nextStopAtMillis) {
       Serial.println(F("== FreezeDance::loop() -> FREEZE!"));
-      if (isPlaying()) {
-        mp3.playAdvertisement(301);
+      if (Tonuinoo::isPlaying()) {
+        Tonuinoo::mp3->playAdvertisement(301);
         delay(500);
       }
       setNextStopAtMillis();
@@ -29,9 +28,9 @@ class FreezeDance : public Modifier {
   }
   FreezeDance(void) {
     Serial.println(F("=== FreezeDance()"));
-    if (isPlaying()) {
+    if (Tonuinoo::isPlaying()) {
       delay(1000);
-      mp3.playAdvertisement(300);
+      Tonuinoo::mp3->playAdvertisement(300);
       delay(500);
     }
     setNextStopAtMillis();

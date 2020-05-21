@@ -1,9 +1,11 @@
 #include "NfcHandler.h"
-#include "Tonuino.h"
+#include "Tonuinoo.h"
 #include "FreezeDance.h"
 #include "KindergardenMode.h"
 #include "RepeatSingleModifier.h"
 #include "SleepTimer.h"
+#include "Locked.h"
+#include "ToddlerMode.h"
 
 /**************************************************************************************************************************************************************
  * 
@@ -130,39 +132,39 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
 
   if (tempCard.cookie == cardCookie) {
 
-    if (activeModifier != NULL && tempCard.nfcFolderSettings.folder != 0) {
-      if (activeModifier->handleRFID(&tempCard) == true) {
+    if (Tonuinoo::activeModifier != NULL && tempCard.nfcFolderSettings.folder != 0) {
+      if (Tonuinoo::activeModifier->handleRFID(&tempCard) == true) {
         return false;
       }
     }
 
     if (tempCard.nfcFolderSettings.folder == 0) {
-      if (activeModifier != NULL) {
-        if (activeModifier->getActive() == tempCard.nfcFolderSettings.mode) {
-          activeModifier = NULL;
+      if (Tonuinoo::activeModifier != NULL) {
+        if (Tonuinoo::activeModifier->getActive() == tempCard.nfcFolderSettings.mode) {
+          Tonuinoo::activeModifier = NULL;
           Serial.println(F("modifier removed"));
-          if (isPlaying()) {
-            mp3.playAdvertisement(261);
+          if (Tonuinoo::isPlaying()) {
+            Tonuinoo::mp3->playAdvertisement(261);
           } else {
-            mp3.start();
+            Tonuinoo::mp3->start();
             delay(100);
-            mp3.playAdvertisement(261);
+            Tonuinoo::mp3->playAdvertisement(261);
             delay(100);
-            mp3.pause();
+            Tonuinoo::mp3->pause();
           }
           delay(2000);
           return false;
         }
       }
       if (tempCard.nfcFolderSettings.mode != 0 && tempCard.nfcFolderSettings.mode != 255) {
-        if (isPlaying()) {
-          mp3.playAdvertisement(260);
+        if (Tonuinoo::isPlaying()) {
+          Tonuinoo::mp3->playAdvertisement(260);
         } else {
-          mp3.start();
+          Tonuinoo::mp3->start();
           delay(100);
-          mp3.playAdvertisement(260);
+          Tonuinoo::mp3->playAdvertisement(260);
           delay(100);
-          mp3.pause();
+          Tonuinoo::mp3->pause();
         }
       }
       switch (tempCard.nfcFolderSettings.mode) {
@@ -170,25 +172,25 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
         case 255:
           mfrc522->PICC_HaltA();
           mfrc522->PCD_StopCrypto1();
-          adminMenu(true);
+          Tonuinoo::adminMenu(true);
           break;
           case 1:
-            activeModifier = new SleepTimer(tempCard.nfcFolderSettings.special);
+            Tonuinoo::activeModifier = new SleepTimer(tempCard.nfcFolderSettings.special);
             break;
           case 2:
-            activeModifier = new FreezeDance();
+            Tonuinoo::activeModifier = new FreezeDance();
             break;
           case 3:
-            activeModifier = new Locked();
+            Tonuinoo::activeModifier = new Locked();
             break;
           case 4:
-            activeModifier = new ToddlerMode();
+            Tonuinoo::activeModifier = new ToddlerMode();
             break;
           case 5:
-            activeModifier = new KindergardenMode();
+            Tonuinoo::activeModifier = new KindergardenMode();
             break;
           case 6:
-            activeModifier = new RepeatSingleModifier();
+            Tonuinoo::activeModifier = new RepeatSingleModifier();
             break;
       }
       delay(2000);
@@ -196,8 +198,8 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
     } else {
       memcpy(nfcTag, &tempCard, sizeof(NfcTagObject));
       Serial.println(nfcTag->nfcFolderSettings.folder);
-      myFolder = &nfcTag->nfcFolderSettings;
-      Serial.println(myFolder->folder);
+      Tonuinoo::myFolder = &nfcTag->nfcFolderSettings;
+      Serial.println(Tonuinoo::myFolder->folder);
     }
     return true;
   } else {
@@ -241,7 +243,7 @@ void NfcHandler::writeCard(NfcTagObject nfcTag) {
   if (status != MFRC522::STATUS_OK) {
     Serial.print(F("PCD_Authenticate() failed: "));
     Serial.println(mfrc522->GetStatusCodeName(status));
-    mp3.playMp3FolderTrack(401);
+    Tonuinoo::mp3->playMp3FolderTrack(401);
     return;
   }
 
@@ -280,9 +282,9 @@ void NfcHandler::writeCard(NfcTagObject nfcTag) {
   if (status != MFRC522::STATUS_OK) {
     Serial.print(F("MIFARE_Write() failed: "));
     Serial.println(mfrc522->GetStatusCodeName(status));
-    mp3.playMp3FolderTrack(401);
+    Tonuinoo::mp3->playMp3FolderTrack(401);
   } else
-    mp3.playMp3FolderTrack(400);
+    Tonuinoo::mp3->playMp3FolderTrack(400);
   Serial.println();
   delay(2000);
 }
@@ -327,5 +329,15 @@ void NfcHandler::init() {
   mfrc522->PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader
   for (byte i = 0; i < 6; i++) {
     key.keyByte[i] = 0xFF;
+  }
+}
+
+/**************************************************************************************************************************************************************
+ * 
+ */
+void NfcHandler::dump_byte_array(byte *buffer, byte bufferSize) {
+  for (byte i = 0; i < bufferSize; i++) {
+    Serial.print(buffer[i] < 0x10 ? " 0" : " ");
+    Serial.print(buffer[i], HEX);
   }
 }

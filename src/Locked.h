@@ -1,8 +1,7 @@
 #ifndef _LOCKED_H
 #define _LOCKED_H
 
-#include "Tonuino.h"
-
+class Tonuinoo;
 class Locked : public Modifier {
  public:
   virtual bool handlePause() {

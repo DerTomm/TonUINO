@@ -1,9 +1,7 @@
 #ifndef _TODDLER_MODE_H
 #define _TODDLER_MODE_H
 
-
-#include "Tonuino.h"
-
+class Tonuinoo;
 class ToddlerMode : public Modifier {
  public:
   virtual bool handlePause() {

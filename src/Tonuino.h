@@ -9,13 +9,13 @@
 #include <SoftwareSerial.h>
 #include <avr/sleep.h>
 #include <FastLED.h>
-#include "NfcHandler.h"
 #include "Modifier.h"
 #include "NfcTagObject.h"
 #include "Locked.h"
 #include "ToddlerMode.h"
 #include "FolderSettings.h"
 #include "AdminSettings.h"
+#include "NfcHandler.h"
 
 // uncomment the below line to enable five button support
 //#define FIVEBUTTONS
@@ -146,9 +146,7 @@ class Mp3NotifyCallback {
   }
 };
 
-SoftwareSerial mySoftwareSerial(2, 3);  // RX, TX
-static DFMiniMp3<SoftwareSerial, Mp3NotifyCallback> mp3(mySoftwareSerial);
-
-NfcHandler nfcHandler;
+DFMiniMp3<SoftwareSerial, Mp3NotifyCallback> *mp3;
+NfcHandler *nfcHandler;
 
 #endif  // _TONUINO_H

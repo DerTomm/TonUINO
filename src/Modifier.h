@@ -1,7 +1,6 @@
 #ifndef _MODIFIER_H
 #define _MODIFIER_H
 
-
 #include "NfcTagObject.h"
 
 class Modifier {

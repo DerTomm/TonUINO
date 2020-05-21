@@ -1,8 +1,7 @@
 #ifndef _SLEEP_TIMER_H
 #define _SLEEP_TIMER_H
 
-#include "Tonuino.h"
-
+class Tonuinoo;
 class SleepTimer : public Modifier {
  private:
   unsigned long sleepAtMillis = 0;
@@ -11,9 +10,9 @@ class SleepTimer : public Modifier {
   void loop() {
     if (this->sleepAtMillis != 0 && millis() > this->sleepAtMillis) {
       Serial.println(F("=== SleepTimer::loop() -> SLEEP!"));
-      mp3.pause();
-      setstandbyTimer();
-      activeModifier = NULL;
+      Tonuinoo::mp3->pause();
+      Tonuinoo::setStandbyTimer();
+      Tonuinoo::activeModifier = NULL;
       delete this;
     }
   }
@@ -23,7 +22,7 @@ class SleepTimer : public Modifier {
     Serial.println(minutes);
     this->sleepAtMillis = millis() + minutes * 60000;
     //      if (isPlaying())
-    //        mp3.playAdvertisement(302);
+    //        mp3->playAdvertisement(302);
     //      delay(500);
   }
   uint8_t getActive() {
