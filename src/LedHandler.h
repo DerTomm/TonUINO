@@ -9,7 +9,7 @@ class LedHandler {
   CRGB leds[NUM_LEDS];
 
  public:
-    LedHandler() {
+  void setup() {
     FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
     FastLED.setBrightness(16);
   }

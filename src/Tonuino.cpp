@@ -993,6 +993,7 @@ void Tonuino::setup() {
   // Battery voltage sense pin
   pinMode(A5, INPUT);
 
+  ledHandler.setup();
   ledHandler.setStatusLedColor(CRGB::Blue);
 
   Serial.begin(115200);  // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
