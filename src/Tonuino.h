@@ -5,11 +5,11 @@
 #include <DFMiniMp3.h>
 #include <SoftwareSerial.h>
 #include <JC_Button.h>
-#include <FastLED.h>
 #include <avr/sleep.h>
 #include "NfcHandler.h"
 #include "Modifier.h"
 #include "AdminSettings.h"
+#include "LedHandler.h"
 
 /* BASED ON:
    _____         _____ _____ _____ _____
@@ -46,15 +46,10 @@
 #define buttonFivePin A4
 #endif
 
-// FastLED
-#define DATA_PIN 6
-#define NUM_LEDS 1
-
 class Tonuino {
 
  private:
   void poweroff();
-  void setStatusLedColor(CRGB color);
   void playShortCut(uint8_t shortCut);
   void checkBatteryVoltage();
   static void setupCard();
@@ -67,6 +62,7 @@ class Tonuino {
   static Button buttonDown;
 
   static NfcHandler nfcHandler;
+  LedHandler ledHandler;
 
 #ifdef FIVEBUTTONS
   Button buttonFour(buttonFourPin);
@@ -165,8 +161,6 @@ class Tonuino {
   static uint8_t volume;
 
   static bool cardKnown;
-  CRGB leds[NUM_LEDS];
-
   static AdminSettings mySettings;  // admin settings stored in eeprom
   static unsigned long sleepAtMillis;
 };

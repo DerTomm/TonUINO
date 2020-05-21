@@ -1,9 +1,11 @@
 #include <EEPROM.h>
 #include "Tonuino.h"
 
+/*
+ * Declaration of static members
+ */
 SoftwareSerial mySoftwareSerial(2, 3);  // RX, TX
 DFMiniMp3<SoftwareSerial, Tonuino::Mp3NotificationCallback> Tonuino::mp3(mySoftwareSerial);
-
 NfcTagObject Tonuino::myCard;
 FolderSettings* Tonuino::myFolder;
 Modifier* Tonuino::activeModifier;
@@ -300,7 +302,7 @@ void Tonuino::checkStandbyAtMillis() {
  */
 void Tonuino::poweroff() {
   Serial.println(F("=== power off!"));
-  setStatusLedColor(CRGB::Black);
+  ledHandler.setStatusLedColor(CRGB::Black);
   // enter sleep state
   disableDfplayerAmplifier();
   delay(500);
@@ -954,16 +956,6 @@ bool Tonuino::checkTwo(uint8_t a[], uint8_t b[]) {
 /**************************************************************************************************************************************************************
  * 
  */
-void Tonuino::setStatusLedColor(CRGB color) {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = color;
-  }
-  FastLED.show();
-}
-
-/**************************************************************************************************************************************************************
- * 
- */
 float Tonuino::readBatteryVoltage() {
   int batteryVoltage = analogRead(A5);
   return batteryVoltage * (4.2 / 1023.0);
@@ -977,11 +969,11 @@ void Tonuino::checkBatteryVoltage() {
   Serial.print("Battery voltage: ");
   Serial.println(batteryVoltage);
   if (batteryVoltage <= 3.4) {
-    setStatusLedColor(CRGB::Red);
+    ledHandler.setStatusLedColor(CRGB::Red);
   } else if (batteryVoltage <= 3.7) {
-    setStatusLedColor(CRGB::Yellow);
+    ledHandler.setStatusLedColor(CRGB::Yellow);
   } else {
-    setStatusLedColor(CRGB::Green);
+    ledHandler.setStatusLedColor(CRGB::Green);
   }
 }
 
@@ -1001,10 +993,7 @@ void Tonuino::setup() {
   // Battery voltage sense pin
   pinMode(A5, INPUT);
 
-  // Initialize FastLED and turn on status LED
-  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(16);
-  setStatusLedColor(CRGB::Blue);
+  ledHandler.setStatusLedColor(CRGB::Blue);
 
   Serial.begin(115200);  // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
 
