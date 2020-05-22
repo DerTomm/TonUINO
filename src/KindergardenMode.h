@@ -9,7 +9,7 @@ class KindergardenMode : public Modifier {
 
  public:
   virtual bool handleNext() {
-    Serial.println(F("== KindergardenMode::handleNext() -> NEXT"));
+    DEBUG_PRINTLN(F("== KindergardenMode::handleNext() -> NEXT"));
     //if (this->nextCard.cookie == cardCookie && this->nextCard.nfcFolderSettings.folder != 0 && this->nextCard.nfcFolderSettings.mode != 0) {
     //myFolder = &this->nextCard.nfcFolderSettings;
     if (this->cardQueued == true) {
@@ -17,27 +17,27 @@ class KindergardenMode : public Modifier {
 
       Tonuino::myCard = nextCard;
       Tonuino::myFolder = &Tonuino::myCard.nfcFolderSettings;
-      Serial.println(Tonuino::myFolder->folder);
-      Serial.println(Tonuino::myFolder->mode);
+      DEBUG_PRINTLN(Tonuino::myFolder->folder);
+      DEBUG_PRINTLN(Tonuino::myFolder->mode);
       Tonuino::playFolder();
       return true;
     }
     return false;
   }
   //    virtual bool handlePause()     {
-  //      Serial.println(F("== KindergardenMode::handlePause() -> LOCKED!"));
+  //      DEBUG_PRINTLN(F("== KindergardenMode::handlePause() -> LOCKED!"));
   //      return true;
   //    }
   virtual bool handleNextButton() {
-    Serial.println(F("== KindergardenMode::handleNextButton() -> LOCKED!"));
+    DEBUG_PRINTLN(F("== KindergardenMode::handleNextButton() -> LOCKED!"));
     return true;
   }
   virtual bool handlePreviousButton() {
-    Serial.println(F("== KindergardenMode::handlePreviousButton() -> LOCKED!"));
+    DEBUG_PRINTLN(F("== KindergardenMode::handlePreviousButton() -> LOCKED!"));
     return true;
   }
   virtual bool handleRFID(NfcTagObject *newCard) {  // lot of work to do!
-    Serial.println(F("== KindergardenMode::handleRFID() -> queued!"));
+    DEBUG_PRINTLN(F("== KindergardenMode::handleRFID() -> queued!"));
     this->nextCard = *newCard;
     this->cardQueued = true;
     if (!Tonuino::isPlaying()) {
@@ -46,13 +46,13 @@ class KindergardenMode : public Modifier {
     return true;
   }
   KindergardenMode() {
-    Serial.println(F("=== KindergardenMode()"));
+    DEBUG_PRINTLN(F("=== KindergardenMode()"));
     //      if (isPlaying())
     //        mp3.playAdvertisement(305);
     //      delay(500);
   }
   uint8_t getActive() {
-    Serial.println(F("== KindergardenMode::getActive()"));
+    DEBUG_PRINTLN(F("== KindergardenMode::getActive()"));
     return 5;
   }
 };

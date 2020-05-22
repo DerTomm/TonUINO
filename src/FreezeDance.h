@@ -10,15 +10,15 @@ class FreezeDance : public Modifier {
 
   void setNextStopAtMillis() {
     uint16_t seconds = random(this->minSecondsBetweenStops, this->maxSecondsBetweenStops + 1);
-    Serial.println(F("=== FreezeDance::setNextStopAtMillis()"));
-    Serial.println(seconds);
+    DEBUG_PRINTLN(F("=== FreezeDance::setNextStopAtMillis()"));
+    DEBUG_PRINTLN(seconds);
     this->nextStopAtMillis = millis() + seconds * 1000;
   }
 
  public:
   void loop() {
     if (this->nextStopAtMillis != 0 && millis() > this->nextStopAtMillis) {
-      Serial.println(F("== FreezeDance::loop() -> FREEZE!"));
+      DEBUG_PRINTLN(F("== FreezeDance::loop() -> FREEZE!"));
       if (Tonuino::isPlaying()) {
         Tonuino::mp3.playAdvertisement(301);
         delay(500);
@@ -27,7 +27,7 @@ class FreezeDance : public Modifier {
     }
   }
   FreezeDance(void) {
-    Serial.println(F("=== FreezeDance()"));
+    DEBUG_PRINTLN(F("=== FreezeDance()"));
     if (Tonuino::isPlaying()) {
       delay(1000);
       Tonuino::mp3.playAdvertisement(300);
@@ -36,7 +36,7 @@ class FreezeDance : public Modifier {
     setNextStopAtMillis();
   }
   uint8_t getActive() {
-    Serial.println(F("== FreezeDance::getActive()"));
+    DEBUG_PRINTLN(F("== FreezeDance::getActive()"));
     return 2;
   }
 };

@@ -5,7 +5,7 @@ class Tonuino;
 class RepeatSingleModifier : public Modifier {
  public:
   virtual bool handleNext() {
-    Serial.println(F("== RepeatSingleModifier::handleNext() -> REPEAT CURRENT TRACK"));
+    DEBUG_PRINTLN(F("== RepeatSingleModifier::handleNext() -> REPEAT CURRENT TRACK"));
     delay(50);
     if (Tonuino::isPlaying()) return true;
     Tonuino::mp3.playFolderTrack(Tonuino::myFolder->folder, Tonuino::currentTrack);
@@ -13,10 +13,10 @@ class RepeatSingleModifier : public Modifier {
     return true;
   }
   RepeatSingleModifier() {
-    Serial.println(F("=== RepeatSingleModifier()"));
+    DEBUG_PRINTLN(F("=== RepeatSingleModifier()"));
   }
   uint8_t getActive() {
-    Serial.println(F("== RepeatSingleModifier::getActive()"));
+    DEBUG_PRINTLN(F("== RepeatSingleModifier::getActive()"));
     return 6;
   }
 };

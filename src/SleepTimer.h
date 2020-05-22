@@ -9,7 +9,7 @@ class SleepTimer : public Modifier {
  public:
   void loop() {
     if (this->sleepAtMillis != 0 && millis() > this->sleepAtMillis) {
-      Serial.println(F("=== SleepTimer::loop() -> SLEEP!"));
+      DEBUG_PRINTLN(F("=== SleepTimer::loop() -> SLEEP!"));
       Tonuino::mp3.pause();
       Tonuino::setStandbyTimer();
       Tonuino::activeModifier = NULL;
@@ -18,15 +18,15 @@ class SleepTimer : public Modifier {
   }
 
   SleepTimer(uint8_t minutes) {
-    Serial.println(F("=== SleepTimer()"));
-    Serial.println(minutes);
+    DEBUG_PRINTLN(F("=== SleepTimer()"));
+    DEBUG_PRINTLN(minutes);
     this->sleepAtMillis = millis() + minutes * 60000;
     //      if (isPlaying())
     //        mp3.playAdvertisement(302);
     //      delay(500);
   }
   uint8_t getActive() {
-    Serial.println(F("== SleepTimer::getActive()"));
+    DEBUG_PRINTLN(F("== SleepTimer::getActive()"));
     return 1;
   }
 

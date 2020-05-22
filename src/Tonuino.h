@@ -22,6 +22,20 @@
     Information and contribution at https://tonuino.de.
 */
 
+//#define MY_DEBUG
+
+#ifndef MY_DEBUG
+#define DEBUG_PRINT(x)
+#define DEBUG_PRINTLN(x)
+#define DEBUG_EPRINT(x, y)
+#define DEBUG_EPRINTLN(x, y)
+#else
+#define DEBUG_PRINT(x) Serial.print(x)
+#define DEBUG_PRINTLN(x) Serial.println(x)
+#define DEBUG_EPRINT(x, y) Serial.print(x, y)
+#define DEBUG_EPRINTLN(x, y) Serial.print(x, y)
+#endif
+
 // Uncomment the below line to enable five button support
 //#define FIVEBUTTONS
 
@@ -84,19 +98,19 @@ class Tonuino {
    public:
     static void OnError(uint16_t errorCode) {
       // see DfMp3_Error for code meaning
-      Serial.println();
-      Serial.print("Com Error ");
-      Serial.println(errorCode);
+      DEBUG_PRINTLN();
+      DEBUG_PRINT("Com Error ");
+      DEBUG_PRINTLN(errorCode);
     }
     static void PrintlnSourceAction(DfMp3_PlaySources source, const char *action) {
-      if (source & DfMp3_PlaySources_Sd) Serial.print("SD Karte ");
-      if (source & DfMp3_PlaySources_Usb) Serial.print("USB ");
-      if (source & DfMp3_PlaySources_Flash) Serial.print("Flash ");
-      Serial.println(action);
+      if (source & DfMp3_PlaySources_Sd) DEBUG_PRINT("SD Karte ");
+      if (source & DfMp3_PlaySources_Usb) DEBUG_PRINT("USB ");
+      if (source & DfMp3_PlaySources_Flash) DEBUG_PRINT("Flash ");
+      DEBUG_PRINTLN(action);
     }
     static void OnPlayFinished(DfMp3_PlaySources source, uint16_t track) {
-      //      Serial.print("Track beendet");
-      //      Serial.println(track);
+      //      DEBUG_PRINT("Track beendet");
+      //      DEBUG_PRINTLN(track);
       //      delay(100);
       nextTrack(track);
     }
@@ -124,7 +138,7 @@ class Tonuino {
   static void playFolder();
   static void adminMenu(bool fromCard = false);
   static uint8_t voiceMenu(int numberOfOptions, int startMessage, int messageOffset,
-                    bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false);
+                           bool preview = false, int previewFromFolder = 0, int defaultValue = 0, bool exitWithLongPress = false);
   static bool checkTwo(uint8_t a[], uint8_t b[]);
   static void shuffleQueue();
   static void writeSettingsToFlash();
@@ -144,7 +158,7 @@ class Tonuino {
   void enableDfplayerAmplifier();
   void setup();
   void loop();
-  
+
   long batteryMeasureTimestamp;
 
   static Modifier *activeModifier;

@@ -25,12 +25,12 @@ NfcHandler::~NfcHandler() {}
 bool NfcHandler::readCard(NfcTagObject *nfcTag) {
   NfcTagObject tempCard;
   // Show some details of the PICC (that is: the tag/card)
-  Serial.print(F("Card UID:"));
+  DEBUG_PRINT(F("Card UID:"));
   dump_byte_array(mfrc522->uid.uidByte, mfrc522->uid.size);
-  Serial.println();
-  Serial.print(F("PICC type: "));
+  DEBUG_PRINTLN();
+  DEBUG_PRINT(F("PICC type: "));
   MFRC522::PICC_Type piccType = mfrc522->PICC_GetType(mfrc522->uid.sak);
-  Serial.println(mfrc522->PICC_GetTypeName(piccType));
+  DEBUG_PRINTLN(mfrc522->PICC_GetTypeName(piccType));
 
   byte buffer[18];
   byte size = sizeof(buffer);
@@ -39,39 +39,39 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
   if ((piccType == MFRC522::PICC_TYPE_MIFARE_MINI) ||
       (piccType == MFRC522::PICC_TYPE_MIFARE_1K) ||
       (piccType == MFRC522::PICC_TYPE_MIFARE_4K)) {
-    Serial.println(F("Authenticating Classic using key A..."));
+    DEBUG_PRINTLN(F("Authenticating Classic using key A..."));
     status = mfrc522->PCD_Authenticate(
         MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerBlock, &key, &(mfrc522->uid));
   } else if (piccType == MFRC522::PICC_TYPE_MIFARE_UL) {
     byte pACK[] = {0, 0};  //16 bit PassWord ACK returned by the tempCard
 
     // Authenticate using key A
-    Serial.println(F("Authenticating MIFARE UL..."));
+    DEBUG_PRINTLN(F("Authenticating MIFARE UL..."));
     status = mfrc522->PCD_NTAG216_AUTH(key.keyByte, pACK);
   }
 
   if (status != MFRC522::STATUS_OK) {
-    Serial.print(F("PCD_Authenticate() failed: "));
-    Serial.println(mfrc522->GetStatusCodeName(status));
+    DEBUG_PRINT(F("PCD_Authenticate() failed: "));
+    DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
     return false;
   }
 
   // Show the whole sector as it currently is
-  // Serial.println(F("Current data in sector:"));
+  // DEBUG_PRINTLN(F("Current data in sector:"));
   // mfrc522->PICC_DumpMifareClassicSectorToSerial(&(mfrc522->uid), &key, sector);
-  // Serial.println();
+  // DEBUG_PRINTLN();
 
   // Read data from the block
   if ((piccType == MFRC522::PICC_TYPE_MIFARE_MINI) ||
       (piccType == MFRC522::PICC_TYPE_MIFARE_1K) ||
       (piccType == MFRC522::PICC_TYPE_MIFARE_4K)) {
-    Serial.print(F("Reading data from block "));
-    Serial.print(blockAddr);
-    Serial.println(F(" ..."));
+    DEBUG_PRINT(F("Reading data from block "));
+    DEBUG_PRINT(blockAddr);
+    DEBUG_PRINTLN(F(" ..."));
     status = (MFRC522::StatusCode)mfrc522->MIFARE_Read(blockAddr, buffer, &size);
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("MIFARE_Read() failed: "));
-      Serial.println(mfrc522->GetStatusCodeName(status));
+      DEBUG_PRINT(F("MIFARE_Read() failed: "));
+      DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
       return false;
     }
   } else if (piccType == MFRC522::PICC_TYPE_MIFARE_UL) {
@@ -80,42 +80,42 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
 
     status = (MFRC522::StatusCode)mfrc522->MIFARE_Read(8, buffer2, &size2);
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("MIFARE_Read_1() failed: "));
-      Serial.println(mfrc522->GetStatusCodeName(status));
+      DEBUG_PRINT(F("MIFARE_Read_1() failed: "));
+      DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
       return false;
     }
     memcpy(buffer, buffer2, 4);
 
     status = (MFRC522::StatusCode)mfrc522->MIFARE_Read(9, buffer2, &size2);
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("MIFARE_Read_2() failed: "));
-      Serial.println(mfrc522->GetStatusCodeName(status));
+      DEBUG_PRINT(F("MIFARE_Read_2() failed: "));
+      DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
       return false;
     }
     memcpy(buffer + 4, buffer2, 4);
 
     status = (MFRC522::StatusCode)mfrc522->MIFARE_Read(10, buffer2, &size2);
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("MIFARE_Read_3() failed: "));
-      Serial.println(mfrc522->GetStatusCodeName(status));
+      DEBUG_PRINT(F("MIFARE_Read_3() failed: "));
+      DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
       return false;
     }
     memcpy(buffer + 8, buffer2, 4);
 
     status = (MFRC522::StatusCode)mfrc522->MIFARE_Read(11, buffer2, &size2);
     if (status != MFRC522::STATUS_OK) {
-      Serial.print(F("MIFARE_Read_4() failed: "));
-      Serial.println(mfrc522->GetStatusCodeName(status));
+      DEBUG_PRINT(F("MIFARE_Read_4() failed: "));
+      DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
       return false;
     }
     memcpy(buffer + 12, buffer2, 4);
   }
 
-  Serial.print(F("Data on Card "));
-  Serial.println(F(":"));
+  DEBUG_PRINT(F("Data on Card "));
+  DEBUG_PRINTLN(F(":"));
   dump_byte_array(buffer, 16);
-  Serial.println();
-  Serial.println();
+  DEBUG_PRINTLN();
+  DEBUG_PRINTLN();
 
   uint32_t tempCookie;
   tempCookie = (uint32_t)buffer[0] << 24;
@@ -142,7 +142,7 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
       if (Tonuino::activeModifier != NULL) {
         if (Tonuino::activeModifier->getActive() == tempCard.nfcFolderSettings.mode) {
           Tonuino::activeModifier = NULL;
-          Serial.println(F("modifier removed"));
+          DEBUG_PRINTLN(F("modifier removed"));
           if (Tonuino::isPlaying()) {
             Tonuino::mp3.playAdvertisement(261);
           } else {
@@ -197,9 +197,9 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
       return false;
     } else {
       memcpy(nfcTag, &tempCard, sizeof(NfcTagObject));
-      Serial.println(nfcTag->nfcFolderSettings.folder);
+      DEBUG_PRINTLN(nfcTag->nfcFolderSettings.folder);
       Tonuino::myFolder = &nfcTag->nfcFolderSettings;
-      Serial.println(Tonuino::myFolder->folder);
+      DEBUG_PRINTLN(Tonuino::myFolder->folder);
     }
     return true;
   } else {
@@ -229,30 +229,30 @@ void NfcHandler::writeCard(NfcTagObject nfcTag) {
   if ((mifareType == MFRC522::PICC_TYPE_MIFARE_MINI) ||
       (mifareType == MFRC522::PICC_TYPE_MIFARE_1K) ||
       (mifareType == MFRC522::PICC_TYPE_MIFARE_4K)) {
-    Serial.println(F("Authenticating again using key A..."));
+    DEBUG_PRINTLN(F("Authenticating again using key A..."));
     status = mfrc522->PCD_Authenticate(
         MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerBlock, &key, &(mfrc522->uid));
   } else if (mifareType == MFRC522::PICC_TYPE_MIFARE_UL) {
     byte pACK[] = {0, 0};  //16 bit PassWord ACK returned by the NFCtag
 
     // Authenticate using key A
-    Serial.println(F("Authenticating UL..."));
+    DEBUG_PRINTLN(F("Authenticating UL..."));
     status = mfrc522->PCD_NTAG216_AUTH(key.keyByte, pACK);
   }
 
   if (status != MFRC522::STATUS_OK) {
-    Serial.print(F("PCD_Authenticate() failed: "));
-    Serial.println(mfrc522->GetStatusCodeName(status));
+    DEBUG_PRINT(F("PCD_Authenticate() failed: "));
+    DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
     Tonuino::mp3.playMp3FolderTrack(401);
     return;
   }
 
   // Write data to the block
-  Serial.print(F("Writing data into block "));
-  Serial.print(blockAddr);
-  Serial.println(F(" ..."));
+  DEBUG_PRINT(F("Writing data into block "));
+  DEBUG_PRINT(blockAddr);
+  DEBUG_PRINTLN(F(" ..."));
   dump_byte_array(buffer, 16);
-  Serial.println();
+  DEBUG_PRINTLN();
 
   if ((mifareType == MFRC522::PICC_TYPE_MIFARE_MINI) ||
       (mifareType == MFRC522::PICC_TYPE_MIFARE_1K) ||
@@ -280,12 +280,12 @@ void NfcHandler::writeCard(NfcTagObject nfcTag) {
   }
 
   if (status != MFRC522::STATUS_OK) {
-    Serial.print(F("MIFARE_Write() failed: "));
-    Serial.println(mfrc522->GetStatusCodeName(status));
+    DEBUG_PRINT(F("MIFARE_Write() failed: "));
+    DEBUG_PRINTLN(mfrc522->GetStatusCodeName(status));
     Tonuino::mp3.playMp3FolderTrack(401);
   } else
     Tonuino::mp3.playMp3FolderTrack(400);
-  Serial.println();
+  DEBUG_PRINTLN();
   delay(2000);
 }
 
@@ -293,7 +293,7 @@ void NfcHandler::writeCard(NfcTagObject nfcTag) {
  * 
  */
 void NfcHandler::sleep() {
-  Serial.println("NfcHandler.sleep()");
+  DEBUG_PRINTLN("NfcHandler.sleep()");
   mfrc522->PCD_AntennaOff();
   mfrc522->PCD_SoftPowerDown();
 }
@@ -337,7 +337,7 @@ void NfcHandler::init() {
  */
 void NfcHandler::dump_byte_array(byte *buffer, byte bufferSize) {
   for (byte i = 0; i < bufferSize; i++) {
-    Serial.print(buffer[i] < 0x10 ? " 0" : " ");
-    Serial.print(buffer[i], HEX);
+    DEBUG_PRINT(buffer[i] < 0x10 ? " 0" : " ");
+    DEBUG_EPRINT(buffer[i], HEX);
   }
 }
