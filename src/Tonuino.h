@@ -9,7 +9,6 @@
 #include "NfcHandler.h"
 #include "Modifier.h"
 #include "AdminSettings.h"
-#include "LedHandler.h"
 
 /* BASED ON:
    _____         _____ _____ _____ _____
@@ -22,7 +21,7 @@
     Information and contribution at https://tonuino.de.
 */
 
-//#define MY_DEBUG
+#define MY_DEBUG
 
 #ifndef MY_DEBUG
 #define DEBUG_PRINT(x)
@@ -60,12 +59,12 @@
 #define buttonFivePin A4
 #endif
 
+class LedHandler;
+class BatteryHandler;
 class Tonuino {
 
  private:
-  void poweroff();
   void playShortCut(uint8_t shortCut);
-  void checkBatteryVoltage();
   static void setupCard();
   static bool askCode(uint8_t *code);
   static void resetCard();
@@ -76,7 +75,9 @@ class Tonuino {
   static Button buttonDown;
 
   static NfcHandler nfcHandler;
-  LedHandler ledHandler;
+
+  LedHandler *ledHandler;
+  BatteryHandler *batteryHandler;
 
 #ifdef FIVEBUTTONS
   Button buttonFour(buttonFourPin);
@@ -91,8 +92,8 @@ class Tonuino {
 #endif
 
  public:
-  Tonuino() {}
-  ~Tonuino() {}
+  Tonuino();
+  ~Tonuino();
 
   class Mp3NotificationCallback {
    public:
@@ -134,6 +135,7 @@ class Tonuino {
     }
   };
 
+  void poweroff();
   static void nextTrack(uint16_t track);
   static void disableStandbyTimer();
   static void setStandbyTimer();
@@ -156,13 +158,10 @@ class Tonuino {
   void volumeDownButton();
   void nextButton();
   void previousButton();
-  float readBatteryVoltage();
   void disableDfplayerAmplifier();
   void enableDfplayerAmplifier();
   void setup();
   void loop();
-
-  long batteryMeasureTimestamp;
 
   static Modifier *activeModifier;
   static NfcTagObject myCard;

@@ -1,5 +1,7 @@
 #include <EEPROM.h>
 #include "Tonuino.h"
+#include "LedHandler.h"
+#include "BatteryHandler.h"
 
 /*
  * Declaration of static members
@@ -25,6 +27,20 @@ uint16_t Tonuino::firstTrack;
 uint8_t Tonuino::queue[255];
 uint8_t Tonuino::volume;
 AdminSettings Tonuino::mySettings;
+
+/**************************************************************************************************************************************************************
+ * 
+ */
+Tonuino::Tonuino() {
+  ledHandler = new LedHandler();
+  batteryHandler = new BatteryHandler(this, ledHandler);
+}
+
+/**************************************************************************************************************************************************************
+ * 
+ */
+Tonuino::~Tonuino() {
+}
 
 /**************************************************************************************************************************************************************
  * 
@@ -302,7 +318,7 @@ void Tonuino::checkStandbyAtMillis() {
  */
 void Tonuino::poweroff() {
   DEBUG_PRINTLN(F("=== power off!"));
-  ledHandler.setStatusLedColor(CRGB::Black);
+  ledHandler->setStatusLedColor(CRGB::Black);
   // enter sleep state
   disableDfplayerAmplifier();
   delay(500);
@@ -956,30 +972,6 @@ bool Tonuino::checkTwo(uint8_t a[], uint8_t b[]) {
 /**************************************************************************************************************************************************************
  * 
  */
-float Tonuino::readBatteryVoltage() {
-  int batteryVoltage = analogRead(A5);
-  return batteryVoltage * (4.2 / 1023.0);
-}
-
-/**************************************************************************************************************************************************************
- * 
- */
-void Tonuino::checkBatteryVoltage() {
-  float batteryVoltage = readBatteryVoltage();
-  DEBUG_PRINT("Battery voltage: ");
-  DEBUG_PRINTLN(batteryVoltage);
-  if (batteryVoltage <= 3.4) {
-    ledHandler.setStatusLedColor(CRGB::Red);
-  } else if (batteryVoltage <= 3.7) {
-    ledHandler.setStatusLedColor(CRGB::Yellow);
-  } else {
-    ledHandler.setStatusLedColor(CRGB::Green);
-  }
-}
-
-/**************************************************************************************************************************************************************
- * 
- */
 void Tonuino::setup() {
 
   // Power supply board ENABLE pin
@@ -990,11 +982,9 @@ void Tonuino::setup() {
   pinMode(amplifierStandbyPin, OUTPUT);
   enableDfplayerAmplifier();
 
-  // Battery voltage sense pin
-  pinMode(A5, INPUT);
-
-  ledHandler.setup();
-  ledHandler.setStatusLedColor(CRGB::Blue);
+  // Prepare additional feature modules
+  ledHandler->setup();
+  ledHandler->setStatusLedColor(CRGB::Blue);
 
 #ifdef MY_DEBUG
   Serial.begin(115200);  // Es gibt ein paar Debug Ausgaben über die serielle Schnittstelle
@@ -1059,11 +1049,10 @@ void Tonuino::setup() {
     loadSettingsFromFlash();
   }
 
+  batteryHandler->setup();
+
   // Start Shortcut "at Startup" - e.g. Welcome Sound
   playShortCut(3);
-
-  // This initially sets status LED color
-  checkBatteryVoltage();
 }
 
 /**************************************************************************************************************************************************************
@@ -1100,10 +1089,7 @@ void Tonuino::loop() {
       activeModifier->loop();
     }
 
-    if (millis() - batteryMeasureTimestamp >= 30000) {
-      checkBatteryVoltage();
-      batteryMeasureTimestamp = millis();
-    }
+    batteryHandler->loop();
 
     // Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste
     // doppelt belegt werden
