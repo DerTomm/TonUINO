@@ -11,8 +11,8 @@ class Tonuino;
 class NfcHandler {
 
  public:
-  NfcHandler();
-  ~NfcHandler();
+  NfcHandler() : mfrc522(SS_PIN, RST_PIN) {};
+  ~NfcHandler() {};
 
   bool readCard(NfcTagObject *nfcTag);
   void writeCard(NfcTagObject nfcTag);
@@ -27,7 +27,7 @@ class NfcHandler {
  private:
   void dump_byte_array(byte *buffer, byte bufferSize);
 
-  MFRC522 *mfrc522;
+  MFRC522 mfrc522;
   MFRC522::MIFARE_Key key;
   bool successRead;
   byte sector = 1;
