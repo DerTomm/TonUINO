@@ -116,6 +116,9 @@ class Tonuino {
     }
     static void OnPlaySourceOnline(DfMp3_PlaySources source) {
       PrintlnSourceAction(source, "online");
+      if (source & DfMp3_PlaySources_Sd) {
+        setStandbyTimer();
+      }
     }
     static void OnPlaySourceInserted(DfMp3_PlaySources source) {
       PrintlnSourceAction(source, "bereit");
