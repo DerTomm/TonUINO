@@ -4,9 +4,6 @@
 #include <Arduino.h>
 #include <DFMiniMp3.h>
 #include <SoftwareSerial.h>
-#include <JC_Button.h>
-#include <avr/sleep.h>
-#include "NfcHandler.h"
 #include "Modifier.h"
 #include "AdminSettings.h"
 
@@ -21,7 +18,7 @@
     Information and contribution at https://tonuino.de.
 */
 
-#define MY_DEBUG
+//#define MY_DEBUG
 
 #ifndef MY_DEBUG
 #define DEBUG_PRINT(x)
@@ -59,8 +56,10 @@
 #define buttonFivePin A4
 #endif
 
+class NfcHandler;
 class LedHandler;
 class BatteryHandler;
+class Button;
 class Tonuino {
 
  private:

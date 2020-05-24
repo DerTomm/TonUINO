@@ -1,5 +1,8 @@
 #include <EEPROM.h>
+#include <JC_Button.h>
+#include <avr/sleep.h>
 #include "Tonuino.h"
+#include "NfcHandler.h"
 #include "LedHandler.h"
 #include "BatteryHandler.h"
 
