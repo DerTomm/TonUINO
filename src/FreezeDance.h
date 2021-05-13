@@ -41,4 +41,4 @@ class FreezeDance : public Modifier {
   }
 };
 
-#endif // _FREEZE_DANCE_H
+#endif  // _FREEZE_DANCE_H

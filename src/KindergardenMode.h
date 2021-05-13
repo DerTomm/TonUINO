@@ -28,15 +28,15 @@ class KindergardenMode : public Modifier {
   //      DEBUG_PRINTLN(F("== KindergardenMode::handlePause() -> LOCKED!"));
   //      return true;
   //    }
-  virtual bool handleNextButton() {
+  bool handleNextButton() {
     DEBUG_PRINTLN(F("== KindergardenMode::handleNextButton() -> LOCKED!"));
     return true;
   }
-  virtual bool handlePreviousButton() {
+  bool handlePreviousButton() {
     DEBUG_PRINTLN(F("== KindergardenMode::handlePreviousButton() -> LOCKED!"));
     return true;
   }
-  virtual bool handleRFID(NfcTagObject *newCard) {  // lot of work to do!
+  bool handleRFID(NfcTagObject *newCard) {  // lot of work to do!
     DEBUG_PRINTLN(F("== KindergardenMode::handleRFID() -> queued!"));
     this->nextCard = *newCard;
     this->cardQueued = true;
@@ -57,4 +57,4 @@ class KindergardenMode : public Modifier {
   }
 };
 
-#endif // _KINDERGARDEN_MODE_H
+#endif  // _KINDERGARDEN_MODE_H

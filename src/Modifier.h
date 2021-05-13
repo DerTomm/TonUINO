@@ -4,6 +4,7 @@
 #include "NfcTagObject.h"
 
 class Modifier {
+
  public:
   virtual void loop() {}
   virtual bool handlePause() {
@@ -33,8 +34,9 @@ class Modifier {
   virtual uint8_t getActive() {
     return 0;
   }
-  Modifier() {
-  }
+
+  Modifier() {}
+  virtual ~Modifier() {};
 };
 
-#endif // _MODIFIER_H
+#endif  // _MODIFIER_H

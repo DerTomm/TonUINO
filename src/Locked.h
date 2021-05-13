@@ -4,27 +4,27 @@
 class Tonuino;
 class Locked : public Modifier {
  public:
-  virtual bool handlePause() {
+  bool handlePause() {
     DEBUG_PRINTLN(F("== Locked::handlePause() -> LOCKED!"));
     return true;
   }
-  virtual bool handleNextButton() {
+  bool handleNextButton() {
     DEBUG_PRINTLN(F("== Locked::handleNextButton() -> LOCKED!"));
     return true;
   }
-  virtual bool handlePreviousButton() {
+  bool handlePreviousButton() {
     DEBUG_PRINTLN(F("== Locked::handlePreviousButton() -> LOCKED!"));
     return true;
   }
-  virtual bool handleVolumeUp() {
+  bool handleVolumeUp() {
     DEBUG_PRINTLN(F("== Locked::handleVolumeUp() -> LOCKED!"));
     return true;
   }
-  virtual bool handleVolumeDown() {
+  bool handleVolumeDown() {
     DEBUG_PRINTLN(F("== Locked::handleVolumeDown() -> LOCKED!"));
     return true;
   }
-  virtual bool handleRFID(NfcTagObject *newCard) {
+  bool handleRFID(NfcTagObject *newCard) {
     DEBUG_PRINTLN(F("== Locked::handleRFID() -> LOCKED!"));
     return true;
   }
@@ -36,6 +36,7 @@ class Locked : public Modifier {
   uint8_t getActive() {
     return 3;
   }
+  
 };
 
-#endif // _LOCKED_H
+#endif  // _LOCKED_H

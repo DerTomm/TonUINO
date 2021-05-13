@@ -9,7 +9,6 @@ class SleepTimer : public Modifier {
   unsigned long sleepAtMillis = 0;
 
  public:
-
   void loop() {
     if (this->sleepAtMillis != 0 && millis() > this->sleepAtMillis) {
       DEBUG_PRINTLN(F("=== SleepTimer::loop() -> SLEEP!"));
@@ -27,15 +26,12 @@ class SleepTimer : public Modifier {
     //      if (isPlaying())
     //        mp3.playAdvertisement(302);
     //      delay(500);
-    
   }
 
   uint8_t getActive() {
     DEBUG_PRINTLN(F("== SleepTimer::getActive()"));
     return 1;
   }
-
-  virtual ~SleepTimer() {}
 };
 
 #endif  // _SLEEP_TIMER_H

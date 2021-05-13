@@ -35,4 +35,4 @@ class ToddlerMode : public Modifier {
   }
 };
 
-#endif // _TODDLER_MODE_H
+#endif  // _TODDLER_MODE_H
