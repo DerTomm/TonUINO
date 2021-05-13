@@ -48,6 +48,17 @@ Tonuino::~Tonuino() {
 /**************************************************************************************************************************************************************
  * 
  */
+void Tonuino::removeActiveModifier(bool byUser) {
+  if (byUser) {
+    LedHandler::resetBrightness();  // reset LED brightness if modifier (e.g. SleepTimer) is removed on demand by user
+  }
+  delete Tonuino::activeModifier;
+  Tonuino::activeModifier = NULL;
+}
+
+/**************************************************************************************************************************************************************
+ * 
+ */
 void Tonuino::shuffleQueue() {
   // Queue für die Zufallswiedergabe erstellen
   for (uint8_t x = 0; x < numTracksInFolder - firstTrack + 1; x++)
@@ -321,7 +332,6 @@ void Tonuino::checkStandbyAtMillis() {
  */
 void Tonuino::poweroff() {
   DEBUG_PRINTLN(F("=== power off!"));
-  ledHandler->setStatusLedColor(CRGB::Black);
   // enter sleep state
   disableDfplayerAmplifier();
   delay(500);
@@ -807,6 +817,7 @@ uint8_t Tonuino::voiceMenu(int numberOfOptions, int startMessage, int messageOff
     if (buttonPause.pressedFor(LONG_PRESS)) {
       mp3.playMp3FolderTrack(802);
       ignorePauseButton = true;
+      checkStandbyAtMillis();
       return defaultValue;
     }
     if (buttonPause.wasReleased()) {
@@ -1040,17 +1051,6 @@ void Tonuino::setup() {
   pinMode(buttonFourPin, INPUT_PULLUP);
   pinMode(buttonFivePin, INPUT_PULLUP);
 #endif
-
-  // RESET --- ALLE DREI KNÖPFE BEIM STARTEN GEDRÜCKT HALTEN -> alle EINSTELLUNGEN werden gelöscht
-  if (digitalRead(BUTTON_PAUSE) == LOW &&
-      digitalRead(BUTTON_UP) == LOW &&
-      digitalRead(BUTTON_DOWN) == LOW) {
-    DEBUG_PRINTLN(F("Reset -> EEPROM wird gelöscht"));
-    for (unsigned int i = 0; i < EEPROM.length(); i++) {
-      EEPROM.update(i, 0);
-    }
-    loadSettingsFromFlash();
-  }
 
   batteryHandler->setup();
 

@@ -134,7 +134,7 @@ class Tonuino {
     }
   };
 
-  void poweroff();
+  static void poweroff();
   static void nextTrack(uint16_t track);
   static void disableStandbyTimer();
   static void setStandbyTimer();
@@ -150,17 +150,18 @@ class Tonuino {
   void migrateSettings(int oldVersion);
   void loadSettingsFromFlash();
   void previousTrack();
-  void checkStandbyAtMillis();
+  static void checkStandbyAtMillis();
   static void waitForTrackToFinish();
   static void readButtons();
   void volumeUpButton();
   void volumeDownButton();
   void nextButton();
   void previousButton();
-  void disableDfplayerAmplifier();
+  static void disableDfplayerAmplifier();
   void enableDfplayerAmplifier();
   void setup();
   void loop();
+  static void removeActiveModifier(bool byUser = false);
 
   static Modifier *activeModifier;
   static NfcTagObject myCard;

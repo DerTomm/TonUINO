@@ -8,7 +8,11 @@ class RepeatSingleModifier : public Modifier {
     DEBUG_PRINTLN(F("== RepeatSingleModifier::handleNext() -> REPEAT CURRENT TRACK"));
     delay(50);
     if (Tonuino::isPlaying()) return true;
-    Tonuino::mp3.playFolderTrack(Tonuino::myFolder->folder, Tonuino::currentTrack);
+    if (Tonuino::myFolder->mode == 3 || Tonuino::myFolder->mode == 9) {
+      Tonuino::mp3.playFolderTrack(Tonuino::myFolder->folder, Tonuino::queue[Tonuino::currentTrack - 1]);
+    } else {
+      Tonuino::mp3.playFolderTrack(Tonuino::myFolder->folder, Tonuino::currentTrack);
+    }
     Tonuino::lastTrackFinished = 0;
     return true;
   }
@@ -21,4 +25,4 @@ class RepeatSingleModifier : public Modifier {
   }
 };
 
-#endif // _REPEAT_SINGE_MODIFIER_H
+#endif  // _REPEAT_SINGE_MODIFIER_H

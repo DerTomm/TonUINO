@@ -129,7 +129,7 @@ bool NfcHandler::readCard(NfcTagObject *nfcTag) {
     if (tempCard.nfcFolderSettings.folder == 0) {
       if (Tonuino::activeModifier != NULL) {
         if (Tonuino::activeModifier->getActive() == tempCard.nfcFolderSettings.mode) {
-          Tonuino::activeModifier = NULL;
+          Tonuino::removeActiveModifier(true);
           DEBUG_PRINTLN(F("modifier removed"));
           if (Tonuino::isPlaying()) {
             Tonuino::mp3.playAdvertisement(261);
