@@ -30,11 +30,13 @@ uint16_t Tonuino::firstTrack;
 uint8_t Tonuino::queue[255];
 uint8_t Tonuino::volume;
 AdminSettings Tonuino::mySettings;
+Tonuino* Tonuino::ptrTonuino;
 
 /**************************************************************************************************************************************************************
  * 
  */
 Tonuino::Tonuino() {
+  ptrTonuino = this;
   ledHandler = new LedHandler();
   batteryHandler = new BatteryHandler(this, ledHandler);
 }
@@ -332,6 +334,7 @@ void Tonuino::checkStandbyAtMillis() {
  */
 void Tonuino::poweroff() {
   DEBUG_PRINTLN(F("=== power off!"));
+  ptrTonuino->ledHandler->setStatusLedColor(CRGB::Black);
   // enter sleep state
   disableDfplayerAmplifier();
   delay(500);

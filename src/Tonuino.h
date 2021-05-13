@@ -112,28 +112,30 @@ class Tonuino {
       //      DEBUG_PRINT("Track beendet");
       //      DEBUG_PRINTLN(track);
       //      delay(100);
-      nextTrack(track);
+      ptrTonuino->nextTrack(track);
     }
     static void OnPlaySourceOnline(DfMp3_PlaySources source) {
       PrintlnSourceAction(source, "online");
       if (source & DfMp3_PlaySources_Sd) {
-        setStandbyTimer();
+        ptrTonuino->setStandbyTimer();
       }
     }
     static void OnPlaySourceInserted(DfMp3_PlaySources source) {
       PrintlnSourceAction(source, "bereit");
       if (source & DfMp3_PlaySources_Flash) {
-        disableStandbyTimer();
+        ptrTonuino->disableStandbyTimer();
       }
     }
     static void OnPlaySourceRemoved(DfMp3_PlaySources source) {
       PrintlnSourceAction(source, "entfernt");
       if (source & DfMp3_PlaySources_Flash) {
-        setStandbyTimer();
+        ptrTonuino->setStandbyTimer();
       }
     }
   };
 
+  static Tonuino *ptrTonuino;
+ 
   static void poweroff();
   static void nextTrack(uint16_t track);
   static void disableStandbyTimer();
