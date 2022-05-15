@@ -47,9 +47,9 @@
 #define amplifierStandbyPin 8
 #define openAnalogPin A7
 
-#define BUTTON_PAUSE A0
-#define BUTTON_UP A1
-#define BUTTON_DOWN A2
+#define BUTTON_DOWN A0
+#define BUTTON_PAUSE A1
+#define BUTTON_UP A2
 
 #ifdef FIVEBUTTONS
 #define buttonFourPin A3

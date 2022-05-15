@@ -333,6 +333,12 @@ void Tonuino::checkStandbyAtMillis() {
  * 
  */
 void Tonuino::poweroff() {
+
+  mp3.pause();
+
+  /*
+   * Hardware shutdown by MOSFET
+   */
   DEBUG_PRINTLN(F("=== power off!"));
   ptrTonuino->ledHandler->setStatusLedColor(CRGB::Black);
   // enter sleep state
@@ -340,6 +346,10 @@ void Tonuino::poweroff() {
   delay(500);
   digitalWrite(shutdownPin, LOW);
   delay(500);
+
+  /*
+   * Fallback: Software shutdown
+   */
 
   // http://discourse.voss.earth/t/intenso-s10000-powerbank-automatische-abschaltung-software-only/805
   // powerdown to 27mA (powerbank switches off after 30-60s)
